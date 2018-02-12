@@ -1,0 +1,45 @@
+# install rbenv to systemwide
+---
+- name: git clone rbenv
+  git: repo=git://github.com/sstephenson/rbenv.git dest=/usr/local/rbenv accept_hostkey=yes
+
+- name: mkdir rbenv/shims
+  file: dest=/usr/local/rbenv/shims state=directory
+
+- name: mkdir rbenv/versions
+  file: dest=/usr/local/rbenv/versions state=directory
+
+- name: git clone ruby-build
+  git: repo=git://github.com/sstephenson/ruby-build.git dest=/usr/local/rbenv/plugins/ruby-build accept_hostkey=yes
+
+- name: install ruby-build
+  #sudo: true
+  shell: cd /usr/local/rbenv/plugins/ruby-build && ./install.sh
+
+- name: check /etc/profile.d/rbenv.sh is exists
+  stat: path=/etc/profile.d/rbenv.sh
+  register: rbenv_sh
+
+- name: add /etc/profile.d/rbenv.sh
+  shell: |
+    echo 'export RBENV_ROOT="/usr/local/rbenv"' >> /etc/profile.d/rbenv.sh
+    echo 'export PATH="/usr/local/rbenv/bin:$PATH"' >> /etc/profile.d/rbenv.sh
+    echo 'eval "$(rbenv init -)"' >> /etc/profile.d/rbenv.sh
+  when: not rbenv_sh.stat.exists
+
+- name: checks if target ruby is installed
+  shell: cd; bash -lc "rbenv versions | grep {{ ruby_version }} | tr '*' ' ' | sed -e 's/\s\+//' | cut -f1 -d' '"
+  register: ruby_is_installed
+
+- name: install global ruby
+  shell: bash -lc "rbenv install {{ ruby_version }}"
+  when: ruby_is_installed.stdout != ruby_version
+
+- name: set global ruby version
+  shell: bash -lc "rbenv global {{ ruby_version }} && rbenv rehash"
+  #when: [HACK] global version check
+
+# TODO sudo gem install などでrbenvの方のgemを見に行くための設定
+# sudo visudo -f /etc/sudoers.d/rbenv
+# Defaults !secure_path
+# Defaults env_keep += "PATH RBENV_ROOT"

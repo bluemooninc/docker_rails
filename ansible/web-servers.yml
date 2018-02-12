@@ -1,0 +1,16 @@
+- hosts: web-servers
+  sudo: true
+  vars: # 全環境共通の変数を定義 多くなってきたばvars.ymlなどに切り出す
+  #  hostname: vagrant-ansible-rails
+  #  environtment: vagrant
+    ruby_version: 2.4.3
+  #  rbenv_root: /home/vagrant/.rbenv
+  #  rbenv_bin: /home/vagrant/.rbenv/libexec/rbenv
+  roles:
+    - base
+    - rbenv
+    - nginx
+    - mysql
+
+  #  - iptables
+  #  - rails
