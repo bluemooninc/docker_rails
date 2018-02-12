@@ -49,3 +49,94 @@ sh playbook.sh
 [root@localhost docker]# rails -v
 Rails 5.1.4
 ```
+
+## Helloworld する
+
+Helloworld アプリを作成してポート3000での起動を確認します。
+
+```
+cd /home/docker
+mkdir sample
+cd sample
+rails new helloworld
+cd helloworld
+vi Gemfile
+## 以下コメントアウトを外す
+# gem 'therubyracer', platforms: :ruby
+bundle install
+rails s
+=> Booting Puma
+=> Rails 5.1.4 application starting in development
+=> Run `rails server -h` for more startup options
+Puma starting in single mode...
+* Version 3.11.2 (ruby 2.4.3-p205), codename: Love Song
+* Min threads: 5, max threads: 5
+* Environment: development
+* Listening on tcp://0.0.0.0:3000
+Use Ctrl-C to stop
+```
+
+## Unicorn を入れる
+
+```
+vi Gemfile
+# 以下を最下行に追加
+gem 'unicorn'
+# gemをインストール
+bundle install
+#  unicorn の config をコピーする
+cp /home/docker/config/unicorn.rb ./config
+# Rakefile をコピーする
+cp /home/docker/config/Rakefile .
+```
+
+## unicorn の実行とワーカーの確認
+
+
+```
+rake unicorn:start
+bundle exec unicorn_rails -D -c /home/docker/sample/helloworld/config/unicorn.rb -E development
+[root@localhost helloworld]# ps ax | grep ruby
+27286 pts/1    S+     0:00 grep ruby
+[root@localhost helloworld]# ps ax | grep rails
+27267 ?        Sl     0:02 unicorn_rails master -D -c /home/docker/sample/helloworld/config/unicorn.rb -E development
+27276 ?        Sl     0:00 unicorn_rails worker[0] -D -c /home/docker/sample/helloworld/config/unicorn.rb -E development
+27279 ?        Sl     0:00 unicorn_rails worker[1] -D -c /home/docker/sample/helloworld/config/unicorn.rb -E development
+27282 ?        Sl     0:00 unicorn_rails worker[2] -D -c /home/docker/sample/helloworld/config/unicorn.rb -E development
+27288 pts/1    S+     0:00 grep rails
+```
+
+再起動
+
+```
+rake unicorn:restart
+```
+
+終了
+
+```
+rake unicorn:stop
+```
+
+## nginx に設定を追加
+
+```
+## socktとproxyを設定追加したファイルを nginx へ
+cp /home/docker/config/default.conf /etc/nginx/conf.d
+/etc/init.d/nginx restart
+```
+
+3000ポートからsockに変更
+コメントアウトを変更する。
+
+vi config/unicorn.rb
+```
+# 同一マシンでNginxとプロキシ組むならsocketが良い
+listen "/tmp/unicorn.sock"
+# listen 3000
+
+# pid file path Capistranoとか使う時は要設定
+pid "/tmp/unicorn.pid"
+```
+
+rake unicorn:start
