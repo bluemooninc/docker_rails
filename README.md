@@ -123,6 +123,44 @@ rake unicorn:stop
 ```
 ## socktとproxyを設定追加したファイルを nginx へ
 cp /home/docker/config/default.conf /etc/nginx/conf.d
+```
+
+default.conf の中身
+```
+upstream unicorn {
+  server unix:/tmp/_unicorn.sock;
+}
+server {
+    listen       80 default_server;
+    listen       [::]:80 default_server;
+    server_name  _;
+    # root         /usr/share/nginx/html;
+    root         /home/docker/sample/helloworld/public;
+    # Load configuration files for the default server block.
+    # include /etc/nginx/default.d/*.conf;
+    try_files $uri/index.html $uri @unicorn;
+
+    location @unicorn {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_pass http://unicorn;
+    }
+
+    error_page 404 /404.html;
+        location = /40x.html {
+    }
+
+    error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+    }
+
+}
+```
+
+### nginx 再起動
+
+```
 /etc/init.d/nginx restart
 ```
 
@@ -130,13 +168,14 @@ cp /home/docker/config/default.conf /etc/nginx/conf.d
 コメントアウトを変更する。
 
 vi config/unicorn.rb
+
 ```
 # 同一マシンでNginxとプロキシ組むならsocketが良い
-listen "/tmp/unicorn.sock"
+listen "/tmp/_unicorn.sock"
 # listen 3000
 
 # pid file path Capistranoとか使う時は要設定
-pid "/tmp/unicorn.pid"
+pid "/tmp/_unicorn.pid"
 ```
 
 rake unicorn:start
