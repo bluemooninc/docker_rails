@@ -179,3 +179,23 @@ pid "/tmp/_unicorn.pid"
 ```
 
 rake unicorn:start
+
+## hello index を作る
+
+```
+rails g controller hello index
+```
+
+ブラウザから確認
+
+http://localhost/hello/index
+
+以下ファイルを hello world に書き換えて確認
+app/views/hello/index.html.erb
+
+```
+<h1>Hello#index</h1>
+<p>Find me in app/views/hello/index.html.erb</p>
+<p>Hello world!</p>
+<p>現在時刻: <%= Time.current %></p>
+```
