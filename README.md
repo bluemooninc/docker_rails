@@ -1,19 +1,22 @@
-# Docker + Centos6 + ansible + Ruby + Ruby on Rails
+# Mac OS に docker をインストールして、Ruby on Rails の開発環境を準備するまで。
 
-Mac OS に docker をインストールして、Ruby on Rails の開発環境を準備するまで。
+Docker + ansible で Centos6  + nginx + mySQL + Ruby on Rails の開発環境を準備する。
+共有フォルダは、Mac OS ~/docker_rails として CentOSは /home/docker とする。
+SSHのポートは 2022 とする。
+HTTPのポートは 8080 とする。
+Unicorn の設定はハンドとなる。
 
 ## カレントフォルダにdockerフォルダを作成し github からDockerfile 他を取得する
 
 ```
 cd
-mkdir docker 
-git clone blumooninc/rails 
+git clone https://github.com/bluemooninc/docker_rails
 ```
 
 ## クローンしたフォルダに移動して、docker image をビルドする。
 
 ```
-cd rails
+cd docker_rails
 docker pull centos:6.9
 docker build --rm -t local/centos6 .
 ```
