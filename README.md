@@ -1,12 +1,14 @@
 # Mac OS に docker をインストールして、Ruby on Rails の開発環境を準備するまで。
 
-Docker + ansible で Centos6  + nginx + mySQL + Ruby on Rails の開発環境を準備する。
-共有フォルダは、Mac OS ~/docker_rails として CentOSは /home/docker とする。
-SSHのポートは 2022 とする。
-HTTPのポートは 8080 とする。
-Unicorn の設定はハンドとなる。
+Docker Toolbox を初めにインストールします。
+https://store.docker.com/editions/community/docker-ce-desktop-mac
 
-## カレントフォルダにdockerフォルダを作成し github からDockerfile 他を取得する
+Docker + ansible で Centos6  + nginx + mySQL + Ruby on Rails の開発環境を準備します。
+共有フォルダは、Mac OS ~/docker_rails として CentOSは /home/docker とします。
+SSHのポートは 2022 とします。
+HTTPのポートは 8080 とします。
+
+## カレントフォルダに github からクローンして docker_rails を作成する
 
 ```
 cd
