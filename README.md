@@ -26,7 +26,7 @@ docker build --rm -t local/centos6 .
 ## フォルダ共有・ポートを指定してdocker image を実行する
 
 ```
-docker run -d -p 2022:22 -p 8080:80 -v ~/docker/rails:/home/docker --privileged local/centos6 /sbin/init
+docker run -d -p 2022:22 -p 8080:80 -v ~/docker_rails:/home/docker --privileged local/centos6 /sbin/init
 ```
 
 ## イメージ実行されているか確認してSSHで中に入る
@@ -40,7 +40,7 @@ ssh -p 2022 root@127.0.0.1
 
 ```
 cd /home/docker
-sh lamp.sh
+sh playbook.sh
 ```
 
 ## 一旦exit して再度sshで入って確認
